@@ -24,4 +24,4 @@ jobs:
         bundle install
 
     - name: Run RuboCop
-      run: rubocop
+      run: rubocop -A
