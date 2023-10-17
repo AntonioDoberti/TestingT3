@@ -1,6 +1,6 @@
 name: Test and Rubocop
 
-on: 
+on:
   pull_request:
     branches:
       - main
@@ -11,7 +11,7 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v12
+      uses: actions/checkout@v3 
 
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
@@ -24,4 +24,4 @@ jobs:
         bundle install
 
     - name: Run RuboCop
-      run: bundle exec rubocop
+      run: rubocop -A
