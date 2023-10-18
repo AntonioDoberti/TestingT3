@@ -45,9 +45,6 @@ jobs:
         gem install bundler
         bundle install
 
-    - name: migrar db test
-      run: rails db:migrate RAILS_ENV=test
-
     - name: rspec test
       run: rspec
 
