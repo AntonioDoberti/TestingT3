@@ -93,8 +93,9 @@ RSpec.describe User, type: :model do
   describe 'testing validate_password_strength, expected error' do
     it 'is valid with valid attributes' do
       @user.validate_password_strength
-      expect(@user.errors[:password]).to include('no es válido incluir como minimo una mayuscula,
-      minuscula y un simbolo')
+      expect(@user.errors[:password]).to include(
+        'no es válido incluir como minimo una mayuscula, minuscula y un simbolo'
+      )
     end
   end
 end
