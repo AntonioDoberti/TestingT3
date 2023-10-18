@@ -50,6 +50,6 @@ jobs:
 
     - name: upload coverage
       uses: actions/upload-artifact@v3
-        with:
-          name: coverage
-          path: coverage
+      with:
+        name: coverage
+        path: coverage
