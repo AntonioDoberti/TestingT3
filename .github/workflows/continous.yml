@@ -46,7 +46,7 @@ jobs:
         bundle install
 
     - name: rspec test
-      run: rspec
+      run: bundle exec rspec
 
     - name: upload coverage
       uses: actions/upload-artifact@v3
