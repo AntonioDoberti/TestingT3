@@ -30,6 +30,9 @@ jobs:
   test:
     name: test
     runs-on: ubuntu-latest
+    env: 
+      DB_USER: root
+      DB_PASSWORD: 678678
 
     steps:
     - name: checkout code
