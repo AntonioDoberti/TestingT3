@@ -63,3 +63,4 @@ RSpec.describe ReviewController, type: :controller do
     end
   end
 end
+#se asume que no es necesario testear con el admin

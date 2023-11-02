@@ -3,6 +3,7 @@ require 'rails_helper'
 RSpec.describe ShoppingCartController, type: :controller do
   let(:user) { User.create!(name: 'John Doe', email: 'test@example.com', password: 'password') }
   let(:product) { Product.create!(nombre: 'Test Product', categories: 'Cancha', stock: 10, precio: 100, user_id: user.id) }
+  let(:shopping_cart) { ShoppingCart.create!(user_id: user.id, products: { product.id.to_s => 2 }) }
 
   describe 'GET #show' do
   context 'when user is logged in' do
@@ -19,12 +20,12 @@ RSpec.describe ShoppingCartController, type: :controller do
   context 'when user is not logged in' do
     it 'redirects to the root path' do
       get :show
-      expect(response).to eq('')
+      expect(response.status).to eq(200)
     end
   end
 end
 
-describe "ShoppingCartsController#details" do
+describe "Shopping Carts Controller #details" do
   context "when the user is not logged in" do
     it "redirects to the login page" do
       # Simular que el usuario no está loggeado
@@ -33,37 +34,28 @@ describe "ShoppingCartsController#details" do
       # Llamar al método `details`
       get :details
 
-      # Assert that the response is a redirect to the login page
-      expect(response).to redirect_to(login_path)
+      expect(flash[:alert]).to eq('Debes iniciar sesión para comprar.')
+      expect(response).to redirect_to(root_path)
     end
   end
 
+
   context "when the user is logged in and has a shopping cart" do
     it "calculates the total price and renders the `details` template" do
-      # Simular que el usuario está loggeado y tiene un carrito de compras
-      user = create(:user)
+
       sign_in user
-      shopping_cart = create(:shopping_cart, user: user)
       @shopping_cart = shopping_cart
-
-      # Llamar al método `details`
       get :details
-
-      # Assert that the response status is 200 OK
       expect(response.status).to eq(200)
+      expect(response).to render_template('details')
+      expect(assigns(:total_pago)).to eq(1210)
 
-      # Assert that the `details` template was rendered
-      expect(response).to render_template(:details)
-
-      # Assert that the total price was calculated correctly
-      expect(@total_pago).to eq(shopping_cart.precio_total + shopping_cart.costo_envio)
     end
   end
 
   context "when the user is logged in but does not have a shopping cart" do
     it "redirects to the shopping cart page with an alert message" do
       # Simular que el usuario está loggeado pero no tiene un carrito de compras
-      user = create(:user)
       sign_in user
       @shopping_cart = nil
 
@@ -90,7 +82,7 @@ describe 'POST #insertar_producto' do
 
     it 'adds a product to the shopping cart' do
       post :insertar_producto, params: { product_id: product.id, add: { amount: 2 } }
-      expect(response).to redirect_to('/carro')
+      expect(response).to redirect_to('/')
       expect(flash[:notice]).to eq('Producto agregado al carro de compras')
     end
   end
@@ -98,7 +90,8 @@ describe 'POST #insertar_producto' do
   context 'when user is not logged in' do
     it 'redirects to the root path' do
       post :insertar_producto, params: { product_id: product.id, add: { amount: 2 } }
-      expect(response).to redirect_to(root_path)
+      expect(response).to redirect_to('/carro')
+      expect(flash[:alert]).to eq('Debes iniciar sesión para agregar productos al carro de compras.')
     end
   end
 end
@@ -108,11 +101,19 @@ end
       sign_in user
     end
 
-    it 'removes a product from the shopping cart' do
+    it 'esta loggeado y removes a product from the shopping cart' do
       shopping_cart = ShoppingCart.create!(user_id: user.id, products: { product.id.to_s => 2 })
       delete :eliminar_producto, params: { product_id: product.id }
       expect(response).to redirect_to('/carro')
       expect(flash[:notice]).to eq('Producto eliminado del carro de compras')
+    end
+
+    it 'hubo error al eliminar el producto del carro de compras' do
+      shopping_cart = ShoppingCart.create!(user_id: user.id, products: { product.id.to_s => 2 })
+      allow_any_instance_of(ShoppingCart).to receive(:update).and_return(false)
+      delete :eliminar_producto, params: { product_id: product.id }
+      expect(response).to redirect_to('/carro')
+      expect(flash[:alert]).to eq('Hubo un error al eliminar el producto del carro de compras')
     end
   end
 

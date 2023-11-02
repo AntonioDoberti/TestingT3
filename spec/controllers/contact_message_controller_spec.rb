@@ -31,12 +31,6 @@ RSpec.describe ContactMessageController, type: :controller do
         end
       end
 
-    # describe 'GET #show' do
-    #     it 'returns a success response' do
-    #         get :show, params: { name: @contact_message.name }
-    #         expect(response).to be_successful
-    #     end
-    # end
     describe 'GET #show' do
         it 'Shows descendent messages' do
             get :mostrar
@@ -53,7 +47,6 @@ RSpec.describe ContactMessageController, type: :controller do
             expect(assigns(:contact_messages)).to eq([])
         end
     end
-
 
     describe 'DELETE limpiar' do
         it 'returns a success response' do
