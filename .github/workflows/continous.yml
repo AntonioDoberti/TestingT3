@@ -7,7 +7,7 @@ on:
 
 jobs:
   lint:
-    name: rubocop
+    name: RuboCop
     runs-on: ubuntu-latest
 
     steps:
@@ -28,17 +28,28 @@ jobs:
       run: rubocop -A
 
   test:
-    name: test
+    name: Test
     runs-on: ubuntu-latest
     env: 
-      DB_USER: root
-      DB_PASSWORD: 678678
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+
+    services:
+      db:
+        image: postgres:latest
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: myapp_test
+        ports:
+          - 5432:5432
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
 
     steps:
-    - name: checkout code
+    - name: Checkout code
       uses: actions/checkout@v3
 
-    - name: setup Ruby
+    - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
         ruby-version: 3.1.3
@@ -48,10 +59,20 @@ jobs:
         gem install bundler
         bundle install
 
-    - name: rspec test
+    - name: Wait for database
+      run: |
+        until nc -z localhost 5432; do echo "Waiting for Postgres..."; sleep 1; done
+
+    - name: Database setup
+      run: |
+        bundle exec rails db:create
+        bundle exec rails db:schema:load
+        bundle exec rails db:migrate
+
+    - name: Run RSpec tests
       run: bundle exec rspec
 
-    - name: upload coverage
+    - name: Upload coverage
       uses: actions/upload-artifact@v3
       with:
         name: coverage
