@@ -58,9 +58,9 @@ jobs:
 
     - name: Setup DB, Run tests
       env:
-        PGHOST: postgres
+        PGHOST: localhost
         PGUSER: postgres
-        PGPORT: ${{ job.services.postgres.ports[5432] }}
+        PGPORT: 5432
         RAILS_ENV: test
       run: |
         bin/rails db:create db:migrate
@@ -74,4 +74,3 @@ jobs:
       with:
         name: coverage
         path: coverage
-
