@@ -18,6 +18,7 @@ AllCops:
     - 'cypress/app_commands/log_fail.rb'
     - 'cypress/app_commands/factory_bot.rb'
     - 'cypress/app_commands/activerecord_fixtures.rb'
+    - 'spec/**/*'
 
 # Layout
 Layout/LineLength:
