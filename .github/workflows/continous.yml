@@ -58,20 +58,19 @@ jobs:
 
     - name: Setup DB, Run tests
       env:
-        PGHOST: postgres
+        PGHOST: localhost
         PGUSER: postgres
+        PGDATABASE: postgres
+        PGPASSWORD: postgres
         PGPORT: ${{ job.services.postgres.ports[5432] }}
         RAILS_ENV: test
       run: |
         bin/rails db:create db:migrate
         bundle exec rspec
 
-    - name: Run RSpec
-      run: bundle exec rspec
 
     - name: Upload coverage
       uses: actions/upload-artifact@v2
       with:
         name: coverage
         path: coverage
-
