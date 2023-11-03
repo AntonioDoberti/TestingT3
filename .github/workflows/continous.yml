@@ -7,12 +7,12 @@ on:
 
 jobs:
   lint:
-    name: RuboCop
+    name: rubocop
     runs-on: ubuntu-latest
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3 
+      uses: actions/checkout@v2 
 
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
@@ -28,18 +28,14 @@ jobs:
       run: rubocop -A
 
   test:
-    name: Test
+    name: test
     runs-on: ubuntu-latest
-    env: 
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
-
     services:
-      db:
-        image: postgres:latest
+      postgres:
+        image: postgres
         env:
           POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: password
+          POSTGRES_PASSWORD: mysecretpassword
           POSTGRES_DB: myapp_test
         ports:
           - 5432:5432
@@ -47,7 +43,7 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v2
 
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
@@ -59,21 +55,16 @@ jobs:
         gem install bundler
         bundle install
 
-    - name: Wait for database
+    - name: Set up database
       run: |
-        until nc -z localhost 5432; do echo "Waiting for Postgres..."; sleep 1; done
+        bin/rails db:setup RAILS_ENV=test
 
-    - name: Database setup
-      run: |
-        bundle exec rails db:create
-        bundle exec rails db:schema:load
-        bundle exec rails db:migrate
-
-    - name: Run RSpec tests
+    - name: Run RSpec
       run: bundle exec rspec
 
     - name: Upload coverage
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v2
       with:
         name: coverage
         path: coverage
+
