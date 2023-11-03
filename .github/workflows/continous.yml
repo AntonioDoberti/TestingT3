@@ -62,7 +62,7 @@ jobs:
         PGUSER: postgres
         PGDATABASE: postgres
         PGPASSWORD: postgres
-        PGPORT: 5432
+        PGPORT: ${{ job.services.postgres.ports[5432] }}
         RAILS_ENV: test
       run: |
         bin/rails db:create db:migrate
