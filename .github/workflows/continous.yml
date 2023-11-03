@@ -35,7 +35,7 @@ jobs:
         image: postgres:10.8
         env:
           POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: ""
+          POSTGRES_PASSWORD: postgres
           POSTGRES_DB: postgres
         ports:
         - 5432:5432
@@ -58,20 +58,19 @@ jobs:
 
     - name: Setup DB, Run tests
       env:
-        PGHOST: postgres
+        PGHOST: localhost
         PGUSER: postgres
-        PGPORT: ${{job.services.postgres.ports[5432] }}
+        PGDATABASE: postgres
+        PGPASSWORD: postgres
+        PGPORT: ${{ job.services.postgres.ports[5432] }}
         RAILS_ENV: test
       run: |
-        bin/rails db:create db:schema:load
+        bin/rails db:create db:migrate
         bundle exec rspec
 
-    - name: Run RSpec
-      run: bundle exec rspec
 
     - name: Upload coverage
       uses: actions/upload-artifact@v2
       with:
         name: coverage
         path: coverage
-
