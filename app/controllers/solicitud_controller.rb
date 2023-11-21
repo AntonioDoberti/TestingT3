@@ -26,13 +26,34 @@ class SolicitudController < ApplicationController
 
     if params[:solicitud][:reservation_datetime].present?
       fecha = params[:solicitud][:reservation_datetime].to_datetime
-      dia = fecha.strftime('%d/%m/%Y')
-      hora = fecha.strftime('%H:%M')
-      @solicitud.reservation_info = "Solicitud de reserva para el día #{dia}, a las #{hora} hrs"
+      #dia = fecha.strftime('%d/%m/%Y')
+      #hora = fecha.strftime('%H:%M')
+      #@solicitud.reservation_info = "Solicitud de reserva para el día #{dia}, a las #{hora} hrs"      
     end
 
     if @solicitud.save && producto.update(stock: producto.stock)
       flash[:notice] = 'Solicitud de compra creada correctamente!'
+      #si es una solicitud de reserva, borrar el horario reservado de los horarios disponibles en el producto
+      if params[:solicitud][:reservation_datetime].present?
+        if producto.horarios.nil?
+          producto.horarios = ''
+        end
+        dias = producto.horarios.split(';')
+        dias.each do |dia|
+          if dia == params[:solicitud][:reservation_datetime]
+            dias.delete(dia)
+          end
+        end
+        producto.horarios = dias.join(';')
+        if producto.save
+          flash[:notice] = 'Horario reservado correctamente'
+        else
+          flash[:error] =
+            "Hubo un error al guardar los cambios: #{current_user.errors.full_messages.join(', ')}"
+        end
+      end
+      
+      
       redirect_to "/products/leer/#{params[:product_id]}"
     else
       flash[:error] = 'Hubo un error al guardar la solicitud!'

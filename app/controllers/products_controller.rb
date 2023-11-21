@@ -51,6 +51,28 @@ class ProductsController < ApplicationController
                          end
   end
 
+  # Eliminar un horario de un producto dado un día y una hora
+  def eliminar_horario
+    @product = Product.find(params[:id])
+    if @product.horarios.nil?
+      @product.horarios = ''
+    end
+    dias = @product.horarios.split(';')
+    dias.each do |dia|
+      if dia == params[:dia]
+        dias.delete(dia)
+      end
+    end
+    @product.horarios = dias.join(';')
+    if @product.save
+      flash[:notice] = 'Horario eliminado correctamente'
+    else
+      flash[:error] =
+        "Hubo un error al guardar los cambios: #{current_user.errors.full_messages.join(', ')}"
+    end
+    redirect_to "/products/leer/#{params[:id]}"
+  end
+
   # Llamamos a la vista con el formulario para crear un producto
   def crear
     @product = Product.new
