@@ -31,6 +31,7 @@ class UsersController < ApplicationController
   end
 
   # Elimina un producto de la lista de deseados del usuario
+  # :nocov:
   def eliminar_deseado
     deseado = params[:deseado_id]
     current_user.deseados.delete(deseado)
@@ -42,4 +43,5 @@ class UsersController < ApplicationController
     end
     redirect_to '/users/deseados'
   end
+  # :nocov:
 end

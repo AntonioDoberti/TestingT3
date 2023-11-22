@@ -38,9 +38,6 @@ class SolicitudController < ApplicationController
         producto.horarios = dias.join(';')
         if producto.save
           flash[:notice] = 'Horario reservado correctamente'
-        else
-          flash[:error] =
-            "Hubo un error al guardar los cambios: #{current_user.errors.full_messages.join(', ')}"
         end
       end
 

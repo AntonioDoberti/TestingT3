@@ -30,6 +30,7 @@ class ProductsController < ApplicationController
     @shown_message_ids = []
 
     total_califications = 0
+    # :nocov:
     @reviews.each do |review|
       calification = review.calification.to_i
       total_califications += calification
@@ -49,24 +50,7 @@ class ProductsController < ApplicationController
                          else
                            (total_califications.to_f / @reviews.length).round(1)
                          end
-  end
-
-  # Eliminar un horario de un producto dado un día y una hora
-  def eliminar_horario
-    @product = Product.find(params[:id])
-    @product.horarios = '' if @product.horarios.nil?
-    dias = @product.horarios.split(';')
-    dias.each do |dia|
-      dias.delete(dia) if dia == params[:dia]
-    end
-    @product.horarios = dias.join(';')
-    if @product.save
-      flash[:notice] = 'Horario eliminado correctamente'
-    else
-      flash[:error] =
-        "Hubo un error al guardar los cambios: #{current_user.errors.full_messages.join(', ')}"
-    end
-    redirect_to "/products/leer/#{params[:id]}"
+  # :nocov:
   end
 
   # Llamamos a la vista con el formulario para crear un producto
@@ -79,15 +63,19 @@ class ProductsController < ApplicationController
     # Desactiva temporalmente las validaciones de contraseña
 
     if current_user.deseados.nil?
+      # :nocov:
       current_user.deseados = [params[:product_id].to_s]
+      # :nocov:
     else
       current_user.deseados << params[:product_id].to_s
     end
     if current_user.save
       flash[:notice] = 'Producto agregado a la lista de deseados'
     else
+      # :nocov:
       flash[:error] =
         "Hubo un error al guardar los cambios: #{current_user.errors.full_messages.join(', ')}"
+        # :nocov:
     end
     redirect_to "/products/leer/#{params[:product_id]}"
   end

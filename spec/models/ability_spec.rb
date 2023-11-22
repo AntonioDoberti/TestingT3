@@ -52,12 +52,16 @@ RSpec.describe Ability, type: :model do
   before do
     @user = User.create!(name: 'John1', password: 'Nonono123!',
                          email: 'as@gmail.com', role: 'admin')
+    @user2 = User.create!(name: 'Karl', password: 'Nonono123!',
+                          email: 'email@uc.cl', role: 'user')
     @product = Product.create!(nombre: 'John1', precio: 4000, stock: 1, user_id: @user.id, categories: 'Cancha')
     @review = Review.create!(tittle: 'John1', description: 'Nonono123!', calification: 5, user_id: @user.id,
                              product_id: @product.id)
     @message = Message.create!(body: 'John1', user_id: @user.id, product_id: @product.id)
     @solicitud = Solicitud.create!(stock: 1, status: 'Pendiente', user_id: @user.id, product_id: @product.id)
+    @solicitud2 = Solicitud.create!(stock: 1, status: 'Pendiente', user_id:@user2.id , product_id: @product.id)
     @ability = Ability.new(@user)
+    @ability2 = Ability.new(@user2)
   end
 
   describe 'testing user' do
@@ -72,7 +76,12 @@ RSpec.describe Ability, type: :model do
       expect(@ability.can?(:actualizar_review, Review)).to eq(true)
       expect(@ability.can?(:actualizar, Review)).to eq(true)
       expect(@ability.can?(:eliminar, Message)).to eq(true)
-      expect(@ability.can?(:insert_deseado, Product)).to eq(true)
+      
+    end
+  end
+  describe ' product.user_id != user.id el usuario puede insertar un producto deseado si el producto no es suyo' do
+    it 'is valid with valid attributes' do
+      expect(@ability2.can?(:insert_deseado, Product)).to eq(true)
     end
   end
 end

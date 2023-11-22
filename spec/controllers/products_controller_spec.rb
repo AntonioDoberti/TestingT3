@@ -5,7 +5,7 @@ RSpec.describe ProductsController, type: :controller do
   let(:product_params) { { product: { nombre: 'Test Product', precio: 100, stock: 10, categories: 'Cancha' } } }
   let(:invalid_product_params) { { product: { nombre: '', precio: 100, stock: 10, categories: 'Invalid Category' } } }
   let!(:product) { Product.create(nombre: 'Test Product', precio: 100, stock: 10, categories: 'Cancha', user: admin_user) }
-  let(:review) { Review.create(product_id: product.id, user_id: admin_user.id, comentario: 'Test Comment', calificacion: 5)}
+  let(:review) { Review.create(product_id: product.id, user_id: admin_user.id, description: 'Test Comment', calification: 5)}
 
   before do
     sign_in admin_user
@@ -39,6 +39,20 @@ RSpec.describe ProductsController, type: :controller do
     end
   end
 
+  describe 'index params[:category].present? && params[:search].present?' do
+    it 'category and search present' do
+      get :index, params: { category: 'Cancha', search: 'Test' }
+      expect(assigns(:products)).to eq([product])
+    end
+  end
+
+  describe 'elsif params[:search].present?' do
+    it 'search present' do
+      get :index, params: { search: 'Test' }
+      expect(assigns(:products)).to eq([product])
+    end
+  end
+
   describe 'GET leer' do
     it 'returns a success response' do
       get :leer, params: { id: product.id }
@@ -60,12 +74,44 @@ RSpec.describe ProductsController, type: :controller do
     end
   end
 
+  describe ' leer  @reviews.each do |review|' do
+    it 'retorna las reviews del producto' do
+      get :leer, params: { id: product.id }
+      #expect #<ActiveRecord::Associations::CollectionProxy []>
+      expect(assigns(:reviews)).to eq([])
+    end
+  end
+
+  describe 'leer @calification_mean = else ' do
+    it 'retorna el promedio de calificaciones del producto' do
+      get :leer, params: { id: product.id }
+      expect(assigns(:calification_mean)).to eq(nil)
+    end
+  end
+
   describe 'Crear un producto' do 
     it 'debe ser exitoso' do
       get :crear
       expect(response).to render_template('crear')
     end
   end
+
+  describe 'Insertar deseado' do
+    it 'inserta un producto a la lista de deseados' do
+      get :insert_deseado, params: { product_id: product.id }
+      expect(flash[:notice]).to eq('Producto agregado a la lista de deseados')
+      expect(response).to redirect_to("/products/leer/#{product.id}")
+    end
+  end
+
+  describe 'Insertar deseado' do
+    it 'no inserta un producto a la lista de deseados' do
+      get :insert_deseado, params: { product_id: product.id }
+      expect(flash[:error]).to eq(nil)
+      expect(response).to redirect_to("/products/leer/#{product.id}")
+    end
+  end
+
 
   describe 'POST #insertar' do
     context 'with valid params' do

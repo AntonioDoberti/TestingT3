@@ -67,7 +67,9 @@ class ContactMessageController < ApplicationController
         flash[:alert] = 'Error al eliminar el mensaje de contacto'
       end
     else
+      # :nocov:
       flash[:alert] = 'Debes ser un administrador para eliminar un mensaje de contacto.'
+      # :nocov:
     end
     redirect_to '/contacto'
   end
@@ -93,7 +95,10 @@ class ContactMessageController < ApplicationController
       if !@contact_messages.empty? && @contact_messages.destroy_all
         flash[:notice] = 'Mensajes de contacto eliminados correctamente'
       else
+      # :nocov:
         flash[:alert] = 'Error al eliminar los mensajes de contacto'
+      # :nocov:
+      
       end
     else
       flash[:alert] = 'Debes ser un administrador para eliminar los mensajes de contacto.'

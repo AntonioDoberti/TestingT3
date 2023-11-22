@@ -5,7 +5,9 @@ RSpec.describe Solicitud, type: :model do
     @user = User.create!(name: 'John1', password: 'Nonono123!',
                          email: 'as@gmail.com', role: 'admin')
     @product = Product.create!(nombre: 'John1', precio: 4000, stock: 1, user_id: @user.id, categories: 'Cancha')
+    #add a date to the reservation
     @solicitud = Solicitud.new(stock: 1, status: 'Pendiente', user_id: @user.id, product_id: @product.id)
+    
   end
 
   describe 'testing valid solicitud' do

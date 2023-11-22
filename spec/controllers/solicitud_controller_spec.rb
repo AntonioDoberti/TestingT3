@@ -43,9 +43,26 @@ RSpec.describe SolicitudController, type: :controller do
                 expect(response).to redirect_to("/products/leer/#{product.id}")
             end
 
-            it 'solicitud de compra correcxta' do
+            it 'solicitud de compra correcta' do
                 post :insertar, params: { product_id: product.id, solicitud: { stock: 2 } }
                 expect(flash[:notice]).to eq('Solicitud de compra creada correctamente!')
+                expect(response).to redirect_to("/products/leer/#{product.id}")
+            end
+
+            it 'solicitud de compra correcta con horario' do
+                product.horarios = '2021-06-01 10:00'
+                product.save
+                post :insertar, params: { product_id: product.id, solicitud: { stock: 2, reservation_datetime: '2021-06-01 10:00' } }
+                expect(flash[:notice]).to eq('Horario reservado correctamente')
+                expect(response).to redirect_to("/products/leer/#{product.id}")
+            end
+
+            it 'solicitud de compra error al guardar la solicitud' do
+                product.horarios = '2021-06-01 10:00'
+                product.save
+                allow_any_instance_of(Product).to receive(:save).and_return(false)
+                post :insertar, params: { product_id: product.id, solicitud: { stock: 2, reservation_datetime: '2021-06-01 10:00' } }
+                expect(flash[:error]).to eq('Hubo un error al guardar la solicitud!')
                 expect(response).to redirect_to("/products/leer/#{product.id}")
             end
         end

@@ -8,10 +8,13 @@ RSpec.describe ContactMessageController, type: :controller do
     before do
         @user = User.create!(name: 'John1', password: 'Nonono123!',
                              email: 'abc@gmail.com', role: 'admin')
+        @not_admin_user = User.create!(name: 'carla', password: 'Nonono123!',
+                                        email: 'rrr@gmail.com', role: 'user')
         @contact_message = ContactMessage.create!(name: 'John1', mail: 'asd@gmail', title: 'Hola', body: 'Hola')
         @contact_message2 = ContactMessage.create!(name: 'John2', mail: 'asd@gmail', title: 'Hola2', body: 'Hola2')
         @ability = Ability.new(@user)
         @ability.can?(:manage, :all)
+
         sign_in @user
     end
 
@@ -22,6 +25,16 @@ RSpec.describe ContactMessageController, type: :controller do
             expect(flash[:notice]).to eq('Mensaje de contacto enviado correctamente')
         end
     end
+
+    describe ' crear error al enviar el mensaje de contacto' do
+        it 'returns a success response' do
+            allow_any_instance_of(ContactMessage).to receive(:save).and_return(false)
+            post :crear, params: { contact: { name: 'John1', mail: 'asd@gmail', title: 'Hola', body: '' } }
+            expect(response).to redirect_to('/contacto')
+            expect(flash[:alert]).to eq('Error al enviar el mensaje de contacto: ')
+        end
+    end
+
 
     context 'Post #index caso alternativo' do
         it 'no crea un mensaje de contacto y muestra un mensaje de error' do
@@ -65,12 +78,31 @@ RSpec.describe ContactMessageController, type: :controller do
         end
     end
 
+    describe 'Debes ser un administrador para eliminar los mensajes de contacto.' do
+        it 'returns a success response' do
+            sign_in @not_admin_user
+            delete :limpiar
+            expect(response).to redirect_to('/contacto')
+            expect(flash[:alert]).to eq('Debes ser un administrador para eliminar los mensajes de contacto.')
+        end
+    end
+
+
     describe 'DELETE #limpiar' do
         it 'returns a success response' do
             delete :limpiar
             expect(response).to redirect_to('/contacto')
         end
     end
+
+    describe 'DELETE #limpiar caso alternativo' do
+        it 'returns a success response' do
+            allow_any_instance_of(ContactMessage).to receive(:destroy).and_return(false)
+            delete :limpiar
+            expect(response).to redirect_to('/contacto')
+            expect(flash[:alert]).to eq(nil)
+        end
+    end 
 end
 
 
