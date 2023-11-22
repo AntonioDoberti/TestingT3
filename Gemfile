@@ -99,4 +99,3 @@ gem 'yard', '~> 0.9.26'
 
 gem 'httparty'
 gem 'rails-controller-testing'
-

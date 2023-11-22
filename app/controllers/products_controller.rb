@@ -54,14 +54,10 @@ class ProductsController < ApplicationController
   # Eliminar un horario de un producto dado un día y una hora
   def eliminar_horario
     @product = Product.find(params[:id])
-    if @product.horarios.nil?
-      @product.horarios = ''
-    end
+    @product.horarios = '' if @product.horarios.nil?
     dias = @product.horarios.split(';')
     dias.each do |dia|
-      if dia == params[:dia]
-        dias.delete(dia)
-      end
+      dias.delete(dia) if dia == params[:dia]
     end
     @product.horarios = dias.join(';')
     if @product.save
