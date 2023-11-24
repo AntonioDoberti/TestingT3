@@ -54,7 +54,7 @@
                     <p class="title is-2"><%= @product.nombre %></p>
                     <p class="subtitle is-1"> <%= @product.precio.to_i.to_formatted_s(:currency, locale: :es) %></p>
                     <% if @product.categories == "Cancha" %>
-                        <p class="subtitle is-5">Quedan <%= @product.stock %> reservas disponibles</p>
+                        <p class="subtitle is-5">Quedan <%= @horarios.length %> reservas disponibles</p>
                         <% if @horarios.present? %>
                             <p class="subtitle is-5">Los horarios de reserva disponible son:</p>
                             <table>
@@ -84,81 +84,87 @@
                     <% if user_signed_in? %>
                         <% if current_user.id != @product.user_id %>
                             <div class="section py-0 px-4">
-                                <% if @product.categories == "Cancha" %>
-                                    <form method="POST" action="/solicitud/insertar" enctype="multipart/form-data">
-                                        <%= hidden_field_tag :product_id, @product.id %>
-                                        <!-- Protección CSRF -->
-                                        <%= token_tag nil %>
-                                        <div class="field has-addons">
-                                            <div class="field">
-                                                <label class="label">Cuantas reservas deseas hacer?</label>
-                                                <p class="control pl-4">
-                                                    <input class="input" type="number" id="quantity" name="solicitud[stock]" min="1" max="100" step="1" value="1" placeholder="1">
-                                                </p>
-                                                <label class="label">Selecciona fecha y hora de reserva</label>
-                                                <div class="control">
-                                                    <input class="input" type="datetime-local" name="solicitud[reservation_datetime]" required>
-                                                </div>
-                                                <p class="control">
-                                                    <button class="button is-primary">Reservar ahora</button>
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </form>
-                                <%end%>
-                                <br>
-                                <% if @product.categories != "Cancha"%>
-                                    <!-- Comprar ahora -->
-                                    <form method="POST" action="/carro/comprar_ahora" enctype="multipart/form-data">
-                                        <%= hidden_field_tag :product_id, @product.id %>
-                                        <!-- Protección CSRF -->
-                                        <%= token_tag nil %>
-                                        <div class="field has-addons">
-                                            <p class="control pl-4">
-                                                <input class="input" type="number" id="quantity" name="add[amount]" min="1" max="100" step="1" value="1" placeholder="1">
-                                            </p>
-                                            <p class="control">
-                                                <button class="button is-info">Comprar ahora</button>
-                                            </p>
-                                        </div>
-                                    </form>
-                                    <br>
-                                    <form method="POST" action="/carro/insertar_producto" enctype="multipart/form-data">
-                                        <%= hidden_field_tag :product_id, @product.id %>
-                                        <!-- Protección CSRF -->
-                                        <%= token_tag nil %>
-                                        <div class="field has-addons">
-                                            <p class="control pl-4">
-                                                <input class="input" type="number" id="quantity" name="add[amount]" min="1" max="100" step="1" value="1" placeholder="1">
-                                            </p>
-                                            <p class="control">
-                                                <button class="button is-primary">Añadir al carrito</button>
-                                            </p>
-                                        </div>
-                                    </form>
-                                    <br>
-                                <%end%>
-                                <% if !current_user.deseados.include?(@product.id.to_s) %>
-                                    <form method="POST" action="/products/insert_deseado/<%= @product.id %>" enctype="multipart/form-data" style="padding:1rem;">
-                                        <%= hidden_field_tag :product_id, @product.id %>
-                                        <!-- Protección CSRF -->
-                                        <%= token_tag nil %>
-                                        <div class="field has-addons">
-                                            <button class="button is-warning">
-                                            <span class="icon">
-                                                <i class="fas fa-save"></i>
-                                            </span>
-                                            <span>Guardar en deseados</span>
-                                            </button>                                  
-                                        </div>
-                                    </form>
-                                <% else %>
-                                    <div class="level-item has-text-centered">
-                                        <div class="notification is-warning" style= "border-radius: 5px">
-                                            <p class="text is-size-6">Este producto está en tu lista de deseados</p>
-                                        </div>
+                            <% if @product.categories == "Cancha" %>
+                            <form method="POST" action="/solicitud/insertar" enctype="multipart/form-data">
+                              <%= hidden_field_tag :product_id, @product.id %>
+                              <!-- Protección CSRF -->
+                              <%= token_tag nil %>
+                              
+                              <div class="field has-addons">
+                                <div class="field">
+                                        <p class="subtitle">Selecciona un horario de reserva:</p>
+                                        <select name="solicitud[reservation_datetime]" id="reservation_datetime">
+                                        <% @horarios.each do |horario| %>
+                                            <option value="<%=horario[0] %>,<%= horario[1] %>,<%= horario[2]%>">
+                                            <%= horario[0] %> <%= horario[1] %> - <%= horario[2] %>
+                                            </option>
+                                        <% end %>
+                                        </select>
+                                </div>
+                              </div>
+
+                              <input class="input" type="hidden" name="solicitud[stock]" value="1">
+                              
+                              <div class="field">
+                                <p class="control">
+                                  <button class="button is-primary">Reservar ahora</button>
+                                </p>
+                              </div>
+                            </form>
+                          <% end %>
+                            <br>
+                        <% if @product.categories != "Cancha"%>
+                            <!-- Comprar ahora -->
+                            <form method="POST" action="/carro/comprar_ahora" enctype="multipart/form-data">
+                                <%= hidden_field_tag :product_id, @product.id %>
+                                <!-- Protección CSRF -->
+                                <%= token_tag nil %>
+                                <div class="field has-addons">
+                                    <p class="control pl-4">
+                                        <input class="input" type="number" id="quantity" name="add[amount]" min="1" max="100" step="1" value="1" placeholder="1">
+                                    </p>
+                                    <p class="control">
+                                        <button class="button is-info">Comprar ahora</button>
+                                    </p>
+                                </div>
+                            </form>
+                            <br>
+                            <form method="POST" action="/carro/insertar_producto" enctype="multipart/form-data">
+                                <%= hidden_field_tag :product_id, @product.id %>
+                                <!-- Protección CSRF -->
+                                <%= token_tag nil %>
+                                <div class="field has-addons">
+                                    <p class="control pl-4">
+                                        <input class="input" type="number" id="quantity" name="add[amount]" min="1" max="100" step="1" value="1" placeholder="1">
+                                    </p>
+                                    <p class="control">
+                                        <button class="button is-primary">Añadir al carrito</button>
+                                    </p>
+                                </div>
+                            </form>
+                            <br>
+                        <%end%>
+                            <% if !current_user.deseados.include?(@product.id.to_s) %>
+                                <form method="POST" action="/products/insert_deseado/<%= @product.id %>" enctype="multipart/form-data" style="padding:1rem;">
+                                    <%= hidden_field_tag :product_id, @product.id %>
+                                    <!-- Protección CSRF -->
+                                    <%= token_tag nil %>
+                                    <div class="field has-addons">
+                                        <button class="button is-warning">
+                                        <span class="icon">
+                                            <i class="fas fa-save"></i>
+                                        </span>
+                                        <span>Guardar en deseados</span>
+                                        </button>                                  
                                     </div>
-                                <% end %>
+                                </form>
+                            <% else %>
+                                <div class="level-item has-text-centered">
+                                    <div class="notification is-warning" style= "border-radius: 5px">
+                                        <p class="text is-size-6">Este producto está en tu lista de deseados</p>
+                                    </div>
+                                </div>
+                            <% end %>
                             </div>
                         <% else %>
                             <div class="has-text-info has-text-centered">

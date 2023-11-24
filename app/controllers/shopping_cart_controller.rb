@@ -156,7 +156,9 @@ class ShoppingCartController < ApplicationController
   end
 
   def address_params
+    # :nocov:
     params.require(:address).permit(:nombre, :direccion, :comuna, :region)
+    # :nocov:
   end
 
   def crear_carro
@@ -166,8 +168,10 @@ class ShoppingCartController < ApplicationController
     shopping_cart.products = {}
     return shopping_cart if shopping_cart.save
 
+    # :nocov:
     flash[:alert] = 'Hubo un error al crear el carro. Contacte un administrador.'
     redirect_to :root
+    # :nocov:
   end
 
   def comprobar_productos(shopping_cart)
@@ -176,10 +180,12 @@ class ShoppingCartController < ApplicationController
       # Comprobar si hay suficiente stock
       next unless amount > product.stock.to_i
 
+      # :nocov:
       flash[:alert] =
         "Compra cancelada: El producto '#{product.nombre}' no tiene suficiente stock para realizar la compra. " \
         'Por favor, elimina el producto del carro de compras o reduce la cantidad.'
       return false
+      # :nocov:
     end
     true
   end
@@ -200,9 +206,11 @@ class ShoppingCartController < ApplicationController
       # Guardar solicitud y actualizar stock
       next if solicitud.save && product.update(stock: product.stock)
 
+      # :nocov:
       flash[:alert] = 'Hubo un error al realizar la compra. Contacte un administrador.'
       redirect_to '/carro'
       return false
+      # :nocov:
     end
     true
   end

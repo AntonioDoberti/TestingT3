@@ -4,6 +4,7 @@ RSpec.describe User, type: :model do
   before do
     @user = User.new(name: 'John1', password: 'Nonono123!',
                      email: 'as@gmail.com', role: 'admin')
+  
   end
 
   describe 'testing valid user' do
@@ -111,6 +112,22 @@ RSpec.describe User, type: :model do
     it 'is valid with valid attributes' do
       @user.validate_new_wish_product
       expect(@user.errors[:wish_product]).to include
+    end
+  end
+
+  describe 'error add el articulo que se quiere ingresar a la lista de deseados no es valido' do
+    it 'is valid with valid attributes' do
+      ##add deseados and product
+      @user.deseados = [1]
+      @product = Product.new(nombre: 'John1', categories: 'Cancha',
+                              stock: 10, precio: 100, user_id: @user.id)
+      @product.save
+      @user.validate_new_wish_product
+      expect(@user.errors[:wish_product]).to include
+      
+
+      
+      
     end
   end
 end

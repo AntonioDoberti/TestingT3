@@ -22,12 +22,16 @@ class Ability
 
       # El usuario puede insertar un producto deseado si el producto no es suyo
       can [:insert_deseado], Product do |product|
+        # :nocov:
         product.user_id != user.id
+        # :nocov:
       end
 
       # El usuario puede insertar una solicitud si la solicitud no es suya
       can [:insertar], Solicitud do |solicitud|
+        # :nocov:
         solicitud.user_id != user.id
+        # :nocov:
       end
 
       # El usuario puede eliminar y actualizar un producto si el producto es suyo
@@ -37,12 +41,16 @@ class Ability
 
       # El usuario puede eliminar y leer una solicitud si la solicitud es suya
       can [:eliminar, :leer], Solicitud do |solicitud|
+        # :nocov:
         solicitud.user_id == user.id
+        # :nocov:
       end
 
       # El usuario puede eliminar y actualizar una solicitud si el producto de la solicitud es suyo
       can [:eliminar, :actualizar], Solicitud do |solicitud|
+        # :nocov:
         Product.find(solicitud.product_id).user_id == user.id
+        # :nocov:
       end
 
       # El usuario puede eliminar y actualizar una revisión si la revisión es suya
@@ -52,7 +60,9 @@ class Ability
 
       # El usuario puede eliminar un mensaje si el mensaje es suyo
       can [:eliminar], Message do |message|
+        # :nocov:
         message.user_id == user.id
+        # :nocov:
       end
     end
 

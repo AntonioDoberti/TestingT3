@@ -7,6 +7,7 @@ class SolicitudController < ApplicationController
   end
 
   # rubocop:disable Metrics/AbcSize
+  # rubocop:disable Metrics/PerceivedComplexity
   # Crea una nueva solicitud de compra
   def insertar
     @solicitud = Solicitud.new
@@ -24,15 +25,20 @@ class SolicitudController < ApplicationController
       producto.stock = producto.stock.to_i - @solicitud.stock.to_i
     end
 
-    if params[:solicitud][:reservation_datetime].present?
-      fecha = params[:solicitud][:reservation_datetime].to_datetime
-      dia = fecha.strftime('%d/%m/%Y')
-      hora = fecha.strftime('%H:%M')
-      @solicitud.reservation_info = "Solicitud de reserva para el día #{dia}, a las #{hora} hrs"
-    end
+    params[:solicitud][:reservation_datetime].to_datetime if params[:solicitud][:reservation_datetime].present?
 
     if @solicitud.save && producto.update(stock: producto.stock)
       flash[:notice] = 'Solicitud de compra creada correctamente!'
+      if params[:solicitud][:reservation_datetime].present?
+        producto.horarios = '' if producto.horarios.nil?
+        dias = producto.horarios.split(';')
+        dias.each do |dia|
+          dias.delete(dia) if dia == params[:solicitud][:reservation_datetime]
+        end
+        producto.horarios = dias.join(';')
+        flash[:notice] = 'Horario reservado correctamente' if producto.save
+      end
+
       redirect_to "/products/leer/#{params[:product_id]}"
     else
       flash[:error] = 'Hubo un error al guardar la solicitud!'
@@ -42,6 +48,7 @@ class SolicitudController < ApplicationController
   end
 
   # rubocop:enable Metrics/AbcSize
+  # rubocop:enable Metrics/PerceivedComplexity
   # Elimina una solicitud de compra
   def eliminar
     @solicitud = Solicitud.find(params[:id])
