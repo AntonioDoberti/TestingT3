@@ -50,7 +50,13 @@ jobs:
       uses: ruby/setup-ruby@v1
       with:
         ruby-version: 3.1.3
-    
+
+    - name: Setup Chrome
+      uses: actions/setup-chrome@v1
+
+    - name: Set Chrome binary
+      run: export CHROME_BIN=${{ env.CHROME_BIN }}
+
     - name: Install project dependencies
       run: |
         gem install bundler
