@@ -1,4 +1,6 @@
 require 'simplecov'
+require 'capybara/rspec'
+
 SimpleCov.start do
   add_group 'Controllers', 'app/request'
   add_group 'Models', 'app/models'
@@ -12,6 +14,8 @@ require_relative '../config/environment'
 abort('The Rails environment is running in production mode!') if Rails.env.production?
 require 'rspec/rails'
 require 'support/devise'
+require 'factory_bot_rails'
+require 'faker'
 # Add additional requires below this line. Rails is not loaded until this point!
 
 # Requires supporting ruby files with custom matchers and macros, etc, in
@@ -67,7 +71,10 @@ RSpec.configure do |config|
   config.filter_rails_from_backtrace!
   # arbitrary gems may also be filtered via:
   # config.filter_gems_from_backtrace("gem name")
+  config.include Capybara::DSL, type: :system
+  config.include FactoryBot::Syntax::Methods
   config.before(:each, type: :system) do
-    driven_by :selenium_chrome
+    driven_by :selenium, using: :chrome, screen_size: [1400, 1400] # Configuración para pruebas con Selenium y Chrome
+    Capybara.server = :puma, { Silent: true }
   end
 end
