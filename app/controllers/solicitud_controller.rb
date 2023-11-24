@@ -36,9 +36,7 @@ class SolicitudController < ApplicationController
           dias.delete(dia) if dia == params[:solicitud][:reservation_datetime]
         end
         producto.horarios = dias.join(';')
-        if producto.save
-          flash[:notice] = 'Horario reservado correctamente'
-        end
+        flash[:notice] = 'Horario reservado correctamente' if producto.save
       end
 
       redirect_to "/products/leer/#{params[:product_id]}"

@@ -50,7 +50,7 @@ class ProductsController < ApplicationController
                          else
                            (total_califications.to_f / @reviews.length).round(1)
                          end
-  # :nocov:
+    # :nocov:
   end
 
   # Llamamos a la vista con el formulario para crear un producto
@@ -75,7 +75,7 @@ class ProductsController < ApplicationController
       # :nocov:
       flash[:error] =
         "Hubo un error al guardar los cambios: #{current_user.errors.full_messages.join(', ')}"
-        # :nocov:
+      # :nocov:
     end
     redirect_to "/products/leer/#{params[:product_id]}"
   end
