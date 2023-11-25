@@ -25,3 +25,5 @@ Incluir aqui cualquier detalle que pueda ser importante al momento de corregir.
  ### Repartición de tareas
  * Raimundo Lira:  Mejorar el Sistema de reservas, Aumentar coverage.
  * Antonio Doberti: Test de sistema para la navegación, Test de sistema para formularios.
+### Importante
+La branch T4 fue creada con atrazo, pero contiene lo mismo que main, la cual no a sido tocada desde la fecha de entrega
